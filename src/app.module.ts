@@ -1,22 +1,14 @@
 import { Module } from '@nestjs/common';
-import { RegisterModule } from './modules/register/register.module';
-import { SequelizeModule } from '@nestjs/sequelize';
-import { User } from './modules/user/user.model';
+import { ConfigModule } from '@nestjs/config';
+import { DatabaseModule } from './core/database/database.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
-    RegisterModule,
-    SequelizeModule.forRoot({
-      dialect: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: 'admin',
-      database: 'test',
-      models: [User],
-      autoLoadModels: true,
-      synchronize: true,
-    }),
+    ConfigModule.forRoot({ isGlobal: true }),
+    DatabaseModule,
+    AuthModule,
+    // UsersModule,
   ],
   controllers: [],
   providers: [],
