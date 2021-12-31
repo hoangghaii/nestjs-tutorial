@@ -11,8 +11,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async validateUser(email: string, password: string) {
-    console.log({ email, password });
+  async validateUser(email: string, pass: string) {
     // find if user exist with this email
     const user = await this.userService.findOneByEmail(email);
     if (!user) {
@@ -20,13 +19,17 @@ export class AuthService {
     }
 
     // find if user password match
-    const match = await this.comparePassword(password, user.password);
+    const match = await this.comparePassword(pass, user.password);
     if (!match) {
       return null;
     }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...result } = user['dataValues'];
+    return result;
   }
 
-  async login(user) {
+  async login(user: UserDto) {
     const token = await this.generateToken(user);
     return { user, token };
   }
@@ -48,7 +51,7 @@ export class AuthService {
     return { user: result, token };
   }
 
-  private async generateToken(user) {
+  private async generateToken(user: UserDto) {
     const token = await this.jwtService.signAsync(user);
     return token;
   }
