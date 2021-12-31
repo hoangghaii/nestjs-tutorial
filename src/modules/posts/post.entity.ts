@@ -1,6 +1,13 @@
-import { Column, DataType, Model, Table } from 'sequelize-typescript';
+import {
+  BelongsTo,
+  Column,
+  DataType,
+  ForeignKey,
+  Model,
+  Table,
+} from 'sequelize-typescript';
+import { User } from '../users/user.entity';
 
-// import { User } from '../users/user.entity';
 @Table
 export class Post extends Model {
   @Column({
@@ -15,13 +22,13 @@ export class Post extends Model {
   })
   body: string;
 
-  // @ForeignKey(() => User)
-  // @Column({
-  //   type: DataType.INTEGER,
-  //   allowNull: false,
-  // })
-  // userId: number;
+  @ForeignKey(() => User)
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+  userId: number;
 
-  // @BelongsTo(() => User)
-  // user: User;
+  @BelongsTo(() => User)
+  user: User;
 }
