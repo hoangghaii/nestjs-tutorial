@@ -1,6 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
-// import { POST_REPOSITORY } from 'src/core/constants';
+import { POST_REPOSITORY } from 'src/core/constants';
 import { User } from '../users/user.entity';
 import { PostDto } from './dto/post.dto';
 import { Post as PostEntity } from './post.entity';
@@ -8,8 +7,7 @@ import { Post as PostEntity } from './post.entity';
 @Injectable()
 export class PostsService {
   constructor(
-    // @Inject(POST_REPOSITORY)
-    @InjectModel(PostEntity)
+    @Inject(POST_REPOSITORY)
     private readonly postRespository: typeof PostEntity,
   ) {}
 

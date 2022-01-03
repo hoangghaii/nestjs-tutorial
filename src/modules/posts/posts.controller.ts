@@ -12,8 +12,11 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
+import { JwtAuthGuard } from 'src/core/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/core/guards/roles.guard';
+import { Roles } from '../auth/roles.decorator';
+import { Role } from '../users/role.enum';
 import { User as UserEntity } from '../users/user.entity';
 import { PostDto } from './dto/post.dto';
 import { Post as PostEntity } from './post.entity';
@@ -42,7 +45,8 @@ export class PostsController {
     return post;
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @Roles(Role.Admin)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Post()
   async create(
     @Body() post: PostDto,
@@ -51,7 +55,7 @@ export class PostsController {
     return await this.postService.create(post, req.user.id);
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @Put(':id')
   async update(
     @Param('id') id: number,
@@ -75,7 +79,7 @@ export class PostsController {
     return updatedPost;
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async remove(
     @Param('id') id: number,

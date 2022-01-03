@@ -22,6 +22,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         'You are not authorized to perform the operation',
       );
     }
-    return payload;
+    return user;
   }
 }

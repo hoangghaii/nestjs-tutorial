@@ -1,4 +1,5 @@
 import { IsEmail, IsEnum, IsNotEmpty, MinLength } from 'class-validator';
+import { Role } from '../role.enum';
 
 enum Gender {
   MALE = 'male',
@@ -22,4 +23,6 @@ export class UserDto {
     message: 'gender must be either male or female',
   })
   readonly gender: string;
+
+  readonly roles: Role[];
 }
