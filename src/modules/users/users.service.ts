@@ -22,6 +22,12 @@ export class UsersService {
     return await this.userRepository.findOne<UserEntity>({ where: { id } });
   }
 
+  async findAll(): Promise<UserEntity[]> {
+    return this.userRepository.findAll({
+      attributes: { exclude: ['password'] },
+    });
+  }
+
   async update(id: number, data: UserDto): Promise<any> {
     const [numberOfAffectedRows, [updatedUser]] =
       await this.userRepository.update(
@@ -30,5 +36,9 @@ export class UsersService {
       );
 
     return { numberOfAffectedRows, updatedUser };
+  }
+
+  async delete(id: number): Promise<any> {
+    return this.userRepository.destroy({ cascade: true, where: { id } });
   }
 }

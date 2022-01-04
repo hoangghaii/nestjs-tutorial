@@ -10,13 +10,15 @@ import {
   Put,
   Request,
   Res,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
+import { diskStorage } from 'multer';
 import { JwtAuthGuard } from 'src/core/guards/jwt-auth.guard';
-import { RolesGuard } from 'src/core/guards/roles.guard';
-import { Roles } from '../auth/roles.decorator';
-import { Role } from '../users/role.enum';
+import { editFileName } from '../upload/upload.utils';
 import { User as UserEntity } from '../users/user.entity';
 import { PostDto } from './dto/post.dto';
 import { Post as PostEntity } from './post.entity';
@@ -45,27 +47,55 @@ export class PostsController {
     return post;
   }
 
-  @Roles(Role.Admin)
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard)
   @Post()
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './files',
+        filename: editFileName,
+      }),
+    }),
+  )
   async create(
     @Body() post: PostDto,
     @Request() req: { user: UserEntity },
+    @UploadedFile() file: Express.Multer.File,
   ): Promise<PostEntity> {
-    return await this.postService.create(post, req.user.id);
+    const filename = file.filename;
+    const createdPost = {
+      ...post,
+      fileUrl: `./files${filename}`,
+    };
+    return await this.postService.create(createdPost, req.user.id);
   }
 
   @UseGuards(JwtAuthGuard)
   @Put(':id')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './files',
+        filename: editFileName,
+      }),
+    }),
+  )
   async update(
     @Param('id') id: number,
     @Body() post: PostDto,
     @Request() req: { user: UserEntity },
+    @UploadedFile() file: Express.Multer.File,
   ): Promise<PostEntity> {
+    const filename = file.filename;
+    const updatePost = {
+      ...post,
+      fileUrl: `./files${filename}`,
+    };
+
     // get the number of row affected and the updated post
     const { numberOfAffectedRows, updatedPost } = await this.postService.update(
       id,
-      post,
+      updatePost,
       req.user.id,
     );
 

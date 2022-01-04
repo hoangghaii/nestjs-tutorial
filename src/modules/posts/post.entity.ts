@@ -22,6 +22,11 @@ export class Post extends Model {
   })
   body: string;
 
+  @Column({
+    type: DataType.STRING,
+  })
+  fileUrl?: string;
+
   @ForeignKey(() => User)
   @Column({
     type: DataType.INTEGER,

@@ -1,4 +1,5 @@
-import { Column, DataType, Model, Table } from 'sequelize-typescript';
+import { Column, DataType, HasMany, Model, Table } from 'sequelize-typescript';
+import { Post } from '../posts/post.entity';
 import { Role } from './role.enum';
 
 @Table
@@ -35,4 +36,7 @@ export class User extends Model {
     allowNull: false,
   })
   roles: string[];
+
+  @HasMany(() => Post, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+  posts: Post;
 }
