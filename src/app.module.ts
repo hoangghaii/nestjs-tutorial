@@ -6,6 +6,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { PostsController } from './modules/posts/posts.controller';
 import { PostsModule } from './modules/posts/posts.module';
 import { UploadModule } from './modules/upload/upload.module';
+import { UsersController } from './modules/users/users.controller';
 import { UsersModule } from './modules/users/users.module';
 
 @Module({
@@ -22,6 +23,6 @@ import { UsersModule } from './modules/users/users.module';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthMiddleware).forRoutes(PostsController);
+    consumer.apply(AuthMiddleware).forRoutes(PostsController, UsersController);
   }
 }

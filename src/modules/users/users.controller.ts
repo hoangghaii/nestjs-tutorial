@@ -23,13 +23,12 @@ export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
   @Roles(Role.Admin)
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(RolesGuard)
   @Get()
   async findAll() {
     return await this.userService.findAll();
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get(':id')
   async getById(@Param('id') id: number) {
     // find the user with this id
@@ -45,7 +44,7 @@ export class UsersController {
   }
 
   @Roles(Role.Admin)
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(RolesGuard)
   @Put(':id')
   async update(@Param('id') id: number, @Body() user: UserDto) {
     // get the number of row affected and the updated user
