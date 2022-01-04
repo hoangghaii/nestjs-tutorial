@@ -19,7 +19,10 @@ export class UsersService {
   }
 
   async findOneById(id: number): Promise<UserEntity> {
-    return await this.userRepository.findOne<UserEntity>({ where: { id } });
+    return await this.userRepository.findOne<UserEntity>({
+      where: { id },
+      attributes: { exclude: ['password'] },
+    });
   }
 
   async findAll(): Promise<UserEntity[]> {
@@ -39,6 +42,6 @@ export class UsersService {
   }
 
   async delete(id: number): Promise<any> {
-    return this.userRepository.destroy({ cascade: true, where: { id } });
+    return this.userRepository.destroy({ where: { id } });
   }
 }

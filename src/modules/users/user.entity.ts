@@ -37,6 +37,6 @@ export class User extends Model {
   })
   roles: string[];
 
-  @HasMany(() => Post, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
-  posts: Post;
+  // @HasMany(() => Post, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+  // posts: Post;
 }

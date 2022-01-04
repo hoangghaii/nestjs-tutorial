@@ -34,6 +34,6 @@ export class Post extends Model {
   })
   userId: number;
 
-  @BelongsTo(() => User)
+  @BelongsTo(() => User, { onDelete: 'CASCADE' })
   user: User;
 }

@@ -47,7 +47,6 @@ export class PostsController {
     return post;
   }
 
-  @UseGuards(JwtAuthGuard)
   @Post()
   @UseInterceptors(
     FileInterceptor('file', {
@@ -70,7 +69,6 @@ export class PostsController {
     return await this.postService.create(createdPost, req.user.id);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Put(':id')
   @UseInterceptors(
     FileInterceptor('file', {
@@ -109,7 +107,6 @@ export class PostsController {
     return updatedPost;
   }
 
-  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async remove(
     @Param('id') id: number,
