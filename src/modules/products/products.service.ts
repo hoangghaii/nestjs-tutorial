@@ -1,6 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { PRODUCT_REPOSITORY } from 'src/core/constants';
-import { User } from '../users/user.entity';
 import { ProductDto } from './dto/product.dto';
 import { Product as ProductEntity } from './product.entity';
 
@@ -11,31 +10,23 @@ export class ProductsService {
     private readonly productRespository: typeof ProductEntity,
   ) {}
 
-  async create(product: ProductDto, userId: number): Promise<ProductEntity> {
-    return await this.productRespository.create({ ...product, userId });
+  async create(product: ProductDto): Promise<ProductEntity> {
+    return await this.productRespository.create({ ...product });
   }
 
   async getAll(): Promise<ProductEntity[]> {
-    return this.productRespository.findAll();
+    return await this.productRespository.findAll();
   }
 
   async getById(id: number): Promise<ProductEntity> {
-    return this.productRespository.findOne({
-      where: { id },
-      attributes: { exclude: ['userId'] },
-      include: { model: User, attributes: { exclude: ['password'] } },
-    });
+    return await this.productRespository.findOne({ where: { id } });
   }
 
-  async update(
-    id: number,
-    data: ProductDto,
-    userId: number,
-  ): Promise<ProductEntity | null> {
+  async update(id: number, data: ProductDto): Promise<ProductEntity | null> {
     const [_numberOfAffectedRows, updatedRow] =
       await this.productRespository.update(
         { ...data },
-        { where: { id, userId }, returning: true },
+        { where: { id }, returning: true },
       );
 
     if ((updatedRow as unknown as number) === 0) {
@@ -47,7 +38,7 @@ export class ProductsService {
     return updatedProduct;
   }
 
-  async delete(id: number, userId: number): Promise<any> {
-    return await this.productRespository.destroy({ where: { id, userId } });
+  async delete(id: number): Promise<any> {
+    return await this.productRespository.destroy({ where: { id } });
   }
 }

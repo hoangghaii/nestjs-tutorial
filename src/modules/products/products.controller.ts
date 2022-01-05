@@ -8,16 +8,18 @@ import {
   Param,
   Post,
   Put,
-  Req,
   Res,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { diskStorage } from 'multer';
+import { RolesGuard } from 'src/core/guards/roles.guard';
+import { Roles } from '../auth/roles.decorator';
 import { editFileName } from '../upload/upload.utils';
-import { User as UserEntity } from '../users/user.entity';
+import { Role } from '../users/role.enum';
 import { ProductDto } from './dto/product.dto';
 import { ProductsService } from './products.service';
 
@@ -41,6 +43,8 @@ export class ProductsController {
     return product;
   }
 
+  @Roles(Role.Admin)
+  @UseGuards(RolesGuard)
   @Post()
   @UseInterceptors(
     FileInterceptor('image', {
@@ -52,7 +56,6 @@ export class ProductsController {
   )
   async create(
     @Body() product: ProductDto,
-    @Req() req: { user: UserEntity },
     @UploadedFile() file: Express.Multer.File,
   ) {
     const filename = file.filename;
@@ -60,9 +63,11 @@ export class ProductsController {
       ...product,
       imageLink: `./files/products/${filename}`,
     };
-    return this.productService.create(createdProduct, req.user.id);
+    return this.productService.create(createdProduct);
   }
 
+  @Roles(Role.Admin)
+  @UseGuards(RolesGuard)
   @Put(':id')
   @UseInterceptors(
     FileInterceptor('image', {
@@ -75,7 +80,6 @@ export class ProductsController {
   async update(
     @Param('id') id: number,
     @Body() product: ProductDto,
-    @Req() req: { user: UserEntity },
     @UploadedFile() file: Express.Multer.File,
   ) {
     const filename = file.filename;
@@ -83,11 +87,7 @@ export class ProductsController {
       ...product,
       imageLink: `./files/products/${filename}`,
     };
-    const updatedProduct = this.productService.update(
-      id,
-      updateProduct,
-      req.user.id,
-    );
+    const updatedProduct = this.productService.update(id, updateProduct);
 
     if (!updatedProduct) {
       throw new NotFoundException("This product doestn't exist");
@@ -96,13 +96,11 @@ export class ProductsController {
     return updatedProduct;
   }
 
+  @Roles(Role.Admin)
+  @UseGuards(RolesGuard)
   @Delete(':id')
-  async remove(
-    @Param('id') id: number,
-    @Req() req: { user: UserEntity },
-    @Res() res: Response,
-  ) {
-    const deletedProduct = await this.productService.delete(id, req.user.id);
+  async remove(@Param('id') id: number, @Res() res: Response) {
+    const deletedProduct = await this.productService.delete(id);
 
     if (!deletedProduct) {
       throw new NotFoundException("This product doestn't exist");

@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsNumber, MinLength } from 'class-validator';
+import { IsEnum, IsNotEmpty, MinLength } from 'class-validator';
 import {
   AgeGroup,
   Availability,

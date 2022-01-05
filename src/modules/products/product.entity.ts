@@ -1,12 +1,4 @@
-import {
-  BelongsTo,
-  Column,
-  DataType,
-  ForeignKey,
-  Model,
-  Table,
-} from 'sequelize-typescript';
-import { User } from '../users/user.entity';
+import { Column, DataType, Model, Table } from 'sequelize-typescript';
 
 export enum Availability {
   Stock = 'in stock',
@@ -110,14 +102,4 @@ export class Product extends Model {
     allowNull: false,
   })
   gender: string[];
-
-  @ForeignKey(() => User)
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: false,
-  })
-  userId: number;
-
-  @BelongsTo(() => User, { onDelete: 'CASCADE' })
-  user: User;
 }
