@@ -22,7 +22,12 @@ export class UserDto {
   @IsEnum(Gender, {
     message: 'gender must be either male or female',
   })
-  readonly gender: string;
+  readonly gender: Gender = Gender.MALE;
 
-  readonly roles: Role[];
+  @IsNotEmpty()
+  @IsEnum(Role, {
+    each: true,
+    message: 'Role must be either user or admin or both',
+  })
+  readonly roles: Role[] = [Role.User];
 }

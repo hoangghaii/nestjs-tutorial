@@ -5,6 +5,8 @@ import { AuthMiddleware } from './core/middleware/auth.middleware';
 import { AuthModule } from './modules/auth/auth.module';
 import { PostsController } from './modules/posts/posts.controller';
 import { PostsModule } from './modules/posts/posts.module';
+import { ProductsController } from './modules/products/products.controller';
+import { ProductsModule } from './modules/products/products.module';
 import { UploadModule } from './modules/upload/upload.module';
 import { UsersController } from './modules/users/users.controller';
 import { UsersModule } from './modules/users/users.module';
@@ -17,12 +19,15 @@ import { UsersModule } from './modules/users/users.module';
     PostsModule,
     UsersModule,
     UploadModule,
+    ProductsModule,
   ],
   controllers: [],
   providers: [],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthMiddleware).forRoutes(PostsController, UsersController);
+    consumer
+      .apply(AuthMiddleware)
+      .forRoutes(PostsController, UsersController, ProductsController);
   }
 }
