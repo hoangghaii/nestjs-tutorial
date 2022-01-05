@@ -11,13 +11,11 @@ import {
   Request,
   Res,
   UploadedFile,
-  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { diskStorage } from 'multer';
-import { JwtAuthGuard } from 'src/core/guards/jwt-auth.guard';
 import { editFileName } from '../upload/upload.utils';
 import { User as UserEntity } from '../users/user.entity';
 import { PostDto } from './dto/post.dto';
@@ -64,7 +62,7 @@ export class PostsController {
     const filename = file.filename;
     const createdPost = {
       ...post,
-      fileUrl: `./files${filename}`,
+      fileUrl: `./files/${filename}`,
     };
     return await this.postService.create(createdPost, req.user.id);
   }
@@ -87,19 +85,17 @@ export class PostsController {
     const filename = file.filename;
     const updatePost = {
       ...post,
-      fileUrl: `./files${filename}`,
+      fileUrl: `./files/${filename}`,
     };
-
-    // get the number of row affected and the updated post
-    const { numberOfAffectedRows, updatedPost } = await this.postService.update(
+    const updatedPost = await this.postService.update(
       id,
       updatePost,
       req.user.id,
     );
 
-    // if the number of row affected is zero,
+    // if !updatedPost,
     // it means the post doesn't exist in our db
-    if (numberOfAffectedRows === 0) {
+    if (!updatedPost) {
       throw new NotFoundException("This Post doesn't exist");
     }
 

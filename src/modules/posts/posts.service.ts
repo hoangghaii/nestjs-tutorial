@@ -17,6 +17,7 @@ export class PostsService {
 
   async findAll(): Promise<PostEntity[]> {
     return await this.postRespository.findAll<PostEntity>({
+      attributes: { exclude: ['userId'] },
       include: [{ model: User, attributes: { exclude: ['password'] } }],
     });
   }
@@ -24,6 +25,7 @@ export class PostsService {
   async findOne(id: number): Promise<PostEntity> {
     return await this.postRespository.findOne({
       where: { id },
+      attributes: { exclude: ['userId'] },
       include: [{ model: User, attributes: { exclude: ['password'] } }],
     });
   }
@@ -32,13 +34,23 @@ export class PostsService {
     return await this.postRespository.destroy({ where: { id, userId } });
   }
 
-  async update(id: number, data: PostDto, userId: number): Promise<any> {
-    const [numberOfAffectedRows, [updatedPost]] =
+  async update(
+    id: number,
+    data: PostDto,
+    userId: number,
+  ): Promise<PostEntity | null> {
+    const [_numberOfAffectedRows, updatedRow] =
       await this.postRespository.update(
         { ...data },
         { where: { id, userId }, returning: true },
       );
 
-    return { numberOfAffectedRows, updatedPost };
+    if ((updatedRow as unknown as number) === 0) {
+      return null;
+    }
+
+    const updatedPost = await this.findOne(id);
+
+    return updatedPost;
   }
 }

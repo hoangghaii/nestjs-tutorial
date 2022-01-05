@@ -47,15 +47,11 @@ export class UsersController {
   @UseGuards(RolesGuard)
   @Put(':id')
   async update(@Param('id') id: number, @Body() user: UserDto) {
-    // get the number of row affected and the updated user
-    const { numberOfAffectedRows, updatedUser } = await this.userService.update(
-      id,
-      user,
-    );
+    const updatedUser = await this.userService.update(id, user);
 
-    // if the number of row affected is zero,
+    // if !updatedUser,
     // it means the user doesn't exist in our db
-    if (numberOfAffectedRows === 0) {
+    if (!updatedUser) {
       throw new NotFoundException("This user doesn't exist");
     }
 

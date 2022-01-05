@@ -31,14 +31,20 @@ export class UsersService {
     });
   }
 
-  async update(id: number, data: UserDto): Promise<any> {
-    const [numberOfAffectedRows, [updatedUser]] =
+  async update(id: number, data: UserDto): Promise<UserEntity | null> {
+    const [_numberOfAffectedRows, updatedRow] =
       await this.userRepository.update(
         { ...data },
         { where: { id }, returning: true },
       );
 
-    return { numberOfAffectedRows, updatedUser };
+    if ((updatedRow as unknown as number) === 0) {
+      return null;
+    }
+
+    const updatedUser = await this.findOneById(id);
+
+    return updatedUser;
   }
 
   async delete(id: number): Promise<any> {
