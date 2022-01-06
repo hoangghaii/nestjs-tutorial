@@ -37,14 +37,4 @@ export class OrderDetail extends Model {
     allowNull: false,
   })
   quantity: number;
-
-  @ForeignKey(() => User)
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: false,
-  })
-  userId: number;
-
-  @BelongsTo(() => User, { onDelete: 'CASCADE' })
-  user: User;
 }

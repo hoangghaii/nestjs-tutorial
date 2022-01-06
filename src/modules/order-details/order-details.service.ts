@@ -1,6 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ORDER_DETAIL_REPOSITORY } from 'src/core/constants';
+import { Order } from '../orders/order.entity';
 import { Product } from '../products/product.entity';
+import { User } from '../users/user.entity';
+import { OrderDetailUpdateDto } from './dto/order-detail-update.dto';
 import { OrderDetailDto } from './dto/order-detail.dto';
 import { OrderDetail as OrderDetailEntity } from './order-detail.entity';
 
@@ -18,35 +21,28 @@ export class OrderDetailsService {
   async findById(id: number): Promise<OrderDetailEntity> {
     return await this.orderDetailRespository.findOne({
       where: { id },
-      attributes: { exclude: ['orderId', 'productId', 'userId'] },
-      include: { model: Product },
+      attributes: { exclude: ['orderId', 'productId'] },
+      include: Product,
     });
   }
 
   async findByOrderId(orderId: number): Promise<OrderDetailEntity[]> {
     return await this.orderDetailRespository.findAll({
       where: { orderId },
-      attributes: { exclude: ['orderId', 'productId', 'userId'] },
-      include: { model: Product },
-    });
-  }
-
-  async findByUser(userId: number): Promise<OrderDetailEntity[]> {
-    return await this.orderDetailRespository.findAll({
-      where: { userId },
-      attributes: { exclude: ['productId', 'userId'] },
-      include: { model: Product },
+      attributes: { exclude: ['orderId', 'productId'] },
+      include: Product,
     });
   }
 
   async updateById(
     id: number,
-    data: OrderDetailDto,
+    orderId: number,
+    data: OrderDetailUpdateDto,
   ): Promise<OrderDetailEntity | null> {
     const [_numberOfAffectedRows, updatedRow] =
       await this.orderDetailRespository.update(
         { ...data },
-        { where: { id }, returning: true },
+        { where: { id, orderId }, returning: true },
       );
 
     if ((updatedRow as unknown as number) === 0) {

@@ -8,7 +8,11 @@ import {
 } from 'class-validator';
 import { Status } from '../order.entity';
 
-class CartItemDto {
+class CartItemUpdateDto {
+  @IsNotEmpty()
+  @IsNumber()
+  readonly id: number;
+
   @IsNotEmpty()
   @IsNumber()
   readonly productId: number;
@@ -18,7 +22,7 @@ class CartItemDto {
   readonly quantity: number;
 }
 
-export class OrderDto {
+export class OrderUpdateDto {
   @IsNotEmpty()
   @IsEnum(Status, {
     message:
@@ -33,6 +37,6 @@ export class OrderDto {
   @IsArray()
   @IsNotEmpty()
   @ValidateNested({ each: true })
-  @Type(() => CartItemDto)
-  readonly cartList: CartItemDto[];
+  @Type(() => CartItemUpdateDto)
+  readonly cartList: CartItemUpdateDto[];
 }

@@ -1,9 +1,9 @@
 import { IsNotEmpty, IsNumber } from 'class-validator';
 
-export class OrderDetailDto {
+export class OrderDetailUpdateDto {
   @IsNotEmpty()
   @IsNumber()
-  readonly orderId: number;
+  readonly id: number;
 
   @IsNotEmpty()
   @IsNumber()

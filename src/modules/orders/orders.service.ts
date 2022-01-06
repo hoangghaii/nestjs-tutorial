@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ORDER_REPOSITORY } from 'src/core/constants';
 import { OrderDetailsService } from '../order-details/order-details.service';
 import { User } from '../users/user.entity';
+import { OrderUpdateDto } from './dto/order-update.dto';
 import { OrderDto } from './dto/order.dto';
 import { Order as OrderEntity } from './order.entity';
 
@@ -15,33 +16,33 @@ export class OrdersService {
 
   async create(order: OrderDto, userId: number): Promise<any> {
     const { cartList, ...result } = order;
+
     const newOrder = await this.orderRespository.create({ ...result, userId });
 
-    const orderId = newOrder.id;
+    const orderId = await newOrder.id;
 
     cartList.forEach(async (cart) => {
       await this.orderDetailService.create({
         orderId,
         ...cart,
-        userId,
       });
     });
-
-    return await this.findById(orderId);
   }
 
   async findById(orderId: number): Promise<any> {
-    const order = await this.orderRespository.findByPk(orderId, {
-      attributes: { exclude: ['userId'] },
-      include: [{ model: User, attributes: { exclude: ['password'] } }],
-    });
-    const orderDetailList = await this.orderDetailService.findByOrderId(
-      orderId,
-    );
+    const [order, orderDetailList] = await Promise.all([
+      this.orderRespository.findByPk(orderId, {
+        attributes: { exclude: ['userId'] },
+        include: [{ model: User, attributes: { exclude: ['password'] } }],
+      }),
+      this.orderDetailService.findByOrderId(orderId),
+    ]);
 
     if (!order) {
       return null;
     }
+
+    // console.log(orderDetailList);
 
     const orderDetail = {
       ...order['dataValues'],
@@ -54,28 +55,52 @@ export class OrdersService {
   async findByUser(userId: number): Promise<any> {
     const orderList = await this.orderRespository.findAll({
       where: { userId },
+      include: [
+        {
+          model: User,
+          attributes: {
+            exclude: ['password'],
+          },
+        },
+      ],
       attributes: { exclude: ['userId'] },
     });
 
-    const orderDetailList = await this.orderDetailService.findByUser(userId);
+    return orderList;
+  }
 
-    console.log(orderList);
-    return orderDetailList;
+  async findAll(): Promise<any> {
+    return this.orderRespository.findAll({
+      include: [
+        {
+          model: User,
+          attributes: {
+            exclude: ['password'],
+          },
+        },
+      ],
+      attributes: { exclude: ['userId'] },
+    });
+  }
 
-    // if (!order) {
-    //   return null;
-    // }
+  async update(id: number, data: OrderUpdateDto, userId: number): Promise<any> {
+    const { cartList, ...result } = data;
+    const [_numberOfAffectedRows, updatedRow] =
+      await this.orderRespository.update(
+        { ...result },
+        { where: { id, userId } },
+      );
 
-    // const orderId = order.id;
-    // const orderDetailList = await this.orderDetailService.findByOrderId(
-    //   orderId,
-    // );
+    if ((updatedRow as unknown as number) === 0) {
+      return null;
+    }
 
-    // const orderDetail = {
-    //   ...order['dataValues'],
-    //   cartList: orderDetailList,
-    // };
+    const orderId = id;
 
-    // return orderDetail;
+    cartList.forEach(async (cart) => {
+      await this.orderDetailService.updateById(cart.id, orderId, cart);
+    });
+
+    return await this.findById(orderId);
   }
 }
